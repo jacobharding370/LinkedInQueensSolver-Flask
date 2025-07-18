@@ -53,16 +53,12 @@ def solve_queens_cp_sat(n, color_groups):
         model.AddExactlyOne(cells)
 
     # Diagonal constraints
-    for i1 in range(n):
-        for j1 in range(n):
-            for i2 in range(i1 + 1, n):
-                j2 = j1 + (i2 - i1)
-                if j2 < n:
-                    model.AddAtMostOne([x[(i1, j1)], x[(i2, j2)]])
-                j2_alt = j1 - (i2 - i1)
-                if j2_alt >= 0:
-                    model.AddAtMostOne([x[(i1, j1)], x[(i2, j2_alt)]])
-
+    for i in range(n - 1):
+        for j in range(n - 1):
+            # Top-left to bottom-right diagonal (\)
+            model.Add(x[(i, j)] + x[(i + 1, j + 1)] <= 1)
+            # Top-right to bottom-left diagonal (/)
+            model.Add(x[(i, j + 1)] + x[(i + 1, j)] <= 1)
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
     if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
